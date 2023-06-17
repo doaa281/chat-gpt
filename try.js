@@ -1,25 +1,35 @@
-const { OpenAI } = require('openai');
-const openai = new OpenAI('YOUR_API_KEY');
+const { Configuration, OpenAIApi } = require("openai");
+
+const config = new Configuration({
+	apiKey: "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",
+});
+
+const openai = new OpenAIApi(config);
 
 async function getChatCompletion() {
-  try {
-    const messages = [
-      { role: 'system', content: 'You are a helpful assistant.' },
-      { role: 'user', content: 'What is the weather like today?' },
-      { role: 'assistant', content: 'The weather is sunny and warm.' },
-      { role: 'user', content: 'Great! Will it rain tomorrow?' }
+  
+   const messages = [
+        { role: "system", content: "You are a helpful assistant." },
+     { role: "user", content: "what is the name of naruto mangaka?" },
+         {
+      role: 'assistant',
+      content: 'The name of the mangaka who created "Naruto" is Masashi Kishimoto.'
+     },
+      { role: "user", content: "what is his nationality ?" },
+
+
     ];
+    
 
-    const response = await openai.chatCompletion.create({
-      model: 'YOUR_MODEL',
-      messages: messages
-    });
+    const response = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: messages
+      });
 
-    const completion = response.choices[0].message.content;
+  // console.log(response.data.choices[0]);
+    const completion = response.data.choices[0].message.content;
     console.log('Completion:', completion);
-  } catch (error) {
-    console.error('Error:', error);
-  }
+  
 }
 
 getChatCompletion();

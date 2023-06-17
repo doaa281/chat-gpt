@@ -20,6 +20,8 @@ class ChatController {
       }
       const message = req.body.question;
       const response = await this.chatService.startConversation(message,req.user._id);
+           console.log(response);
+
       if (!response.success) {
         let msg, stat;
         switch (response.error) {
@@ -32,7 +34,7 @@ class ChatController {
             stat = 500;
             break;
         }
-        res.status(stat).json({
+        return res.status(stat).json({
           status: "fail",
           message:msg
         });
@@ -42,7 +44,7 @@ class ChatController {
         data: response.data
       });
     }catch (err) {
-       res.status(500).json({
+       return res.status(500).json({
          status: "fail",
          message:"Internal Server Error"
       });
@@ -81,7 +83,7 @@ class ChatController {
             stat = 500;
             break;
         }
-        res.status(stat).json({
+        return res.status(stat).json({
           status: "fail",
           message: msg
         });
@@ -91,7 +93,7 @@ class ChatController {
         data: response.data
       });
     }catch (err) {
-       res.status(500).json({
+      return res.status(500).json({
          status: "fail",
          message:"Internal Server Error"
       });
@@ -125,7 +127,7 @@ class ChatController {
             stat = 500;
             break;
         }
-        res.status(stat).json({
+        return res.status(stat).json({
           status: "fail",
           message: msg
         });
@@ -135,7 +137,7 @@ class ChatController {
         data: response.data
       });
     }catch (err) {
-       res.status(500).json({
+      return res.status(500).json({
          status: "fail",
          message:"Internal Server Error"
       });

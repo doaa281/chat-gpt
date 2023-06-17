@@ -8,11 +8,11 @@ class ChatRepository extends Repository {
     super(Message);
   }
 
- async addMessage(messageId,userId) {
+ async addMessage(message,role) {
      try {
         
          const messageObject = {
-             role: "user",
+             role: role,
              text: message
          };
          const doc = await this.model.create(messageObject);

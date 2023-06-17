@@ -52,35 +52,60 @@ class ChatRepository extends Repository {
 
    async findChatWithTopMsgs(chatId) {
      try {
-
-       const doc = await Model.aggregate([
-         {
-           $match: {
-             _id: chatId
-           }
-         },
-         {
-           $unwind: "$messages"
-         },
-         {
-           $limit: 10
-         },
-         {
-           $lookup: {
-             from: 'Message',
-             localField: 'messages',
-             foreignField: '_id',
-             as: 'messages'
-           }
-         }
-       ]);
+       console.log("uuuuuuuuuuuuuuuuuuuu");
+       console.log(chatId);
+       const doc = await this.model
+          .findOne({ _id: ObjectId(chatId) },
+                  { title: 1, user: 1, createdAt: 1, messages: { $slice: -10 } })
+          .populate({ path: 'messages', options: { sort: { createdAt: -1 } } });
+//       const doc = await this.model.aggregate([
+//          {
+//            $match: {
+//              _id: ObjectId(chatId)
+//            }
+//          },
+//          {
+//            $project: {
+//               _id: 1,
+//                 title: 1,
+//                 user: 1,
+//                 createdAt:1,
+//                 messages: {
+//                   $slice: ["$messages", -10 ]  
+//                 }
+//             }   
+//          },
+//          {
+//    $lookup:
+//      {
+//        from: "Message",
+//        localField: "messages",
+//        foreignField: "_id",
+//        as: "messages"
+//      }
+// },
+//   {
+//     $group: {
+//       _id: "$_id",
+//       title: { $first: "$title" },
+//       user: { $first: "$user" },
+//       createdAt: { $first: "$createdAt" },
+//       messages: { $push: "$messages" }
+//     }
+//   }
+  
+//        ]);
+       console.log("iiiiiiiiiiiiiiiiiiiiiiii");
        console.log(doc);  
+       console.log("ooooooooooooooooooooooooooo");
+      //  console.log(doc[0].messages);
        if (doc) {
          return { success: true, doc: doc };
        }
        return { success: false, error: mongoErrors.UNKOWN };
     }   
-   catch (err) {
+     catch (err) {
+       console.log(err);
         return { success: false, ...decorateError(err) };
     }
   }

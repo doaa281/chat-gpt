@@ -21,8 +21,7 @@ class ChatService {
   async startConversation(message,userId) {
   
 
-
-    try {
+    // try {
 
       const messages = [
         { role: 'system', content: 'You are a helpful assistant.' },
@@ -30,22 +29,28 @@ class ChatService {
 
       ];
     
+    // console.log("inrrrrrrrrrrrrrrrrrrrr");
 
       const response = await openai.createChatCompletion({
-        model: "text-davinci-003",
+        model: "gpt-3.5-turbo",
         messages: messages
       });
-
+    // console.log("instartttttttttttttt");
 	
-      const answer = response.choices[0].message.content;
-
+      const answer = response.data.choices[0].message.content;
+    // const answer = "hi";
+    console.log(answer);
       //add to messge and to chat
       const firstMessage = await this.messageRepository.addMessage(messages[0].content, "system");
       const addedQuestion = await this.messageRepository.addMessage(message, "user");
       const addedAnswer = await this.messageRepository.addMessage(answer, "assisstant");
-      if (firstMessage.success && addedQuestion.success && addedAnswer.success) {
+    // console.log("nnnnnnnniiiiiiiiiii");
+    if (firstMessage.success && addedQuestion.success && addedAnswer.success) {
         //create chat with first message
-        const chatObject = await this.chatRepository.addChat(firstMessage.doc._id, userId);
+          // console.log("uuuuuuuuuuuuuuuuuuuu");
+
+      const chatObject = await this.chatRepository.addChat(firstMessage.doc._id, userId);
+      console.log(chatObject);
         //append other messages to the chat 
         const appendQuestion = await this.chatRepository.appendToChat(addedQuestion.doc._id, chatObject.doc._id);
         const appendAnswer = await this.chatRepository.appendToChat(addedAnswer.doc._id, chatObject.doc._id);
@@ -60,9 +65,9 @@ class ChatService {
       return { success: false, error: chatErrors.MONGO_ERR };
     
 
-    } catch (err) {
-      return { success: false, error: chatErrors.IN_OPENAI };
-    }
+    // } catch (err) {
+    //   return { success: false, error: chatErrors.IN_OPENAI };
+    // }
 
 
     
@@ -79,12 +84,13 @@ class ChatService {
       // const chat = await this.chatRepository.findById(chatId);
 
       const chat = await this.chatRepository.findChatWithTopMsgs(chatId);
+console.log(chat);
 
       if (!chat.success) {
         return { success: false, error: chatErrors.CONVERSATION_NOT_FOUND };
       }
 //the user not the owner of the conversation
-      if (!userId.equals(chat.doc.owner)) {
+      if (!userId.equals(chat.doc.user)) {
         return { success: false, error: chatErrors.NOT_OWNER };
 
       }
@@ -106,20 +112,19 @@ class ChatService {
     
 
       const response = await openai.createChatCompletion({
-        model: "text-davinci-003",
+       model: "gpt-3.5-turbo",
         messages: messages
       });
 
-	
-      const answer = response.choices[0].message.content;
+      const answer = response.data.choices[0].message.content;
 
       //add to messge to table
       const addedQuestion = await this.messageRepository.addMessage(message, "user");
       const addedAnswer = await this.messageRepository.addMessage(answer, "assisstant");
       if (addedQuestion.success && addedAnswer.success) {
         //append other messages to the chat 
-        const appendQuestion = await this.chatRepository.appendToChat(addedQuestion.doc._id, chatObject.doc._id);
-        const appendAnswer = await this.chatRepository.appendToChat(addedAnswer.doc._id, chatObject.doc._id);
+        const appendQuestion = await this.chatRepository.appendToChat(addedQuestion.doc._id, chatId);
+        const appendAnswer = await this.chatRepository.appendToChat(addedAnswer.doc._id, chatId);
       
         return { success: true, data:answer };
       }
@@ -132,6 +137,7 @@ class ChatService {
     
 
     } catch (err) {
+      console.log(err);
       return { success: false, error: chatErrors.IN_OPENAI };
     }
 
@@ -148,12 +154,13 @@ class ChatService {
 
      
       const chat = await this.chatRepository.findById(chatId,"","messages");
-
       if (!chat.success) {
         return { success: false, error: chatErrors.CONVERSATION_NOT_FOUND };
       }
       //the user not the owner of the conversation
-      if (!userId.equals(chat.doc.owner)) {
+      // console.log(userId);
+      // console.log(chat.doc);
+      if (!userId.equals(chat.doc.user)) {
         return { success: false, error: chatErrors.NOT_OWNER };
 
       }
