@@ -60,11 +60,10 @@ class ChatRepository extends Repository {
            }
          },
          {
-           $project: {
-             messages: {
-               $substrBytes: ["$messages", -40, 10]
-             }
-           }
+           $unwind: "$messages"
+         },
+         {
+           $limit: 10
          },
          {
            $lookup: {
@@ -75,7 +74,6 @@ class ChatRepository extends Repository {
            }
          }
        ]);
-      
        console.log(doc);  
        if (doc) {
          return { success: true, doc: doc };

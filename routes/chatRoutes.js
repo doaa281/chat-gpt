@@ -1,5 +1,6 @@
 const express = require("express");
 const { container } = require("../di-setup");
+const AuthenticationController = container.resolve("AuthenticationController");
 
 const ChatController = container.resolve("ChatController");
 

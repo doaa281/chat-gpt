@@ -89,17 +89,20 @@ class ChatService {
 
       }
 
+//get the messages history to send it to the ai 
+      const messages = chat.doc.messages.map(element => {
+        return {
+          role: element.role,
+          content: element.text
+        }
+      });
+      //add the user question to the context
+      messages.push({ role: "user", content: message });
 
 
 
 
 
-
-      const messages = [
-        { role: 'system', content: 'You are a helpful assistant.' },
-        { role: 'user', content: message }
-
-      ];
     
 
       const response = await openai.createChatCompletion({
@@ -110,18 +113,15 @@ class ChatService {
 	
       const answer = response.choices[0].message.content;
 
-      //add to messge and to chat
-      const firstMessage = await this.messageRepository.addMessage(messages[0].content, "system");
+      //add to messge to table
       const addedQuestion = await this.messageRepository.addMessage(message, "user");
       const addedAnswer = await this.messageRepository.addMessage(answer, "assisstant");
-      if (firstMessage.success && addedQuestion.success && addedAnswer.success) {
-        //create chat with first message
-        const chatObject = await this.chatRepository.addChat(firstMessage.doc._id, userId);
+      if (addedQuestion.success && addedAnswer.success) {
         //append other messages to the chat 
         const appendQuestion = await this.chatRepository.appendToChat(addedQuestion.doc._id, chatObject.doc._id);
         const appendAnswer = await this.chatRepository.appendToChat(addedAnswer.doc._id, chatObject.doc._id);
       
-        return { success: true, data:{chat_id:chatObject.doc._id, answer:answer} };
+        return { success: true, data:answer };
       }
 
     
@@ -139,6 +139,42 @@ class ChatService {
     
   }
   
+
+ async getConversation(userId,chatId) {
+  
+
+
+    try {
+
+     
+      const chat = await this.chatRepository.findById(chatId,"","messages");
+
+      if (!chat.success) {
+        return { success: false, error: chatErrors.CONVERSATION_NOT_FOUND };
+      }
+      //the user not the owner of the conversation
+      if (!userId.equals(chat.doc.owner)) {
+        return { success: false, error: chatErrors.NOT_OWNER };
+
+      }
+
+      
+
+    
+        
+
+    
+      return { success: true, data: chat.doc };
+    
+
+    } catch (err) {
+      return { success: false, error: chatErrors.IN_OPENAI };
+    }
+
+
+    
+}
+
 }
 
 module.exports = ChatService;
