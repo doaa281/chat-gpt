@@ -57,7 +57,7 @@ class ChatRepository extends Repository {
        const doc = await this.model
           .findOne({ _id: ObjectId(chatId) },
                   { title: 1, user: 1, createdAt: 1, messages: { $slice: -10 } })
-          .populate({ path: 'messages', options: { sort: { createdAt: -1 } } });
+          .populate({ path: 'messages', options: { sort: { createdAt: 1 } } });
 //       const doc = await this.model.aggregate([
 //          {
 //            $match: {
@@ -95,9 +95,9 @@ class ChatRepository extends Repository {
 //   }
   
 //        ]);
-       console.log("iiiiiiiiiiiiiiiiiiiiiiii");
-       console.log(doc);  
-       console.log("ooooooooooooooooooooooooooo");
+      //  console.log("iiiiiiiiiiiiiiiiiiiiiiii");
+      //  console.log(doc);  
+      //  console.log("ooooooooooooooooooooooooooo");
       //  console.log(doc[0].messages);
        if (doc) {
          return { success: true, doc: doc };

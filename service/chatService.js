@@ -43,7 +43,7 @@ class ChatService {
       //add to messge and to chat
       const firstMessage = await this.messageRepository.addMessage(messages[0].content, "system");
       const addedQuestion = await this.messageRepository.addMessage(message, "user");
-      const addedAnswer = await this.messageRepository.addMessage(answer, "assisstant");
+      const addedAnswer = await this.messageRepository.addMessage(answer, "assistant");
     // console.log("nnnnnnnniiiiiiiiiii");
     if (firstMessage.success && addedQuestion.success && addedAnswer.success) {
         //create chat with first message
@@ -84,7 +84,7 @@ class ChatService {
       // const chat = await this.chatRepository.findById(chatId);
 
       const chat = await this.chatRepository.findChatWithTopMsgs(chatId);
-console.log(chat);
+// console.log(chat);
 
       if (!chat.success) {
         return { success: false, error: chatErrors.CONVERSATION_NOT_FOUND };
@@ -110,17 +110,22 @@ console.log(chat);
 
 
     
+      // console.log("fffffffffffffffffffffffff");
+      // console.log(messages);
 
       const response = await openai.createChatCompletion({
-       model: "gpt-3.5-turbo",
+        model: "gpt-3.5-turbo",
         messages: messages
       });
-
+      console.log("hererrererereerrrrrrr");
       const answer = response.data.choices[0].message.content;
+            console.log(response);
 
+      // console.log(answer.messages);
+      console.log("fffffffffffffffffffffffff");
       //add to messge to table
       const addedQuestion = await this.messageRepository.addMessage(message, "user");
-      const addedAnswer = await this.messageRepository.addMessage(answer, "assisstant");
+      const addedAnswer = await this.messageRepository.addMessage(answer, "assistant");
       if (addedQuestion.success && addedAnswer.success) {
         //append other messages to the chat 
         const appendQuestion = await this.chatRepository.appendToChat(addedQuestion.doc._id, chatId);
@@ -137,7 +142,8 @@ console.log(chat);
     
 
     } catch (err) {
-      console.log(err);
+      console.log("eror!!!!!!!!!!!!!!!!!");
+      console.log(err.response);
       return { success: false, error: chatErrors.IN_OPENAI };
     }
 
