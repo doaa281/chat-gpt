@@ -8,11 +8,12 @@ class ChatRepository extends Repository {
     super(Chat);
   }
 
- async addChat(messageId,userId) {
+ async addChat(messageId,title,userId) {
      try {
         
          const chatObj = {
-             user : userId,
+           user: userId,
+           title:title,
              messages: [messageId]
          };
          const doc = await this.model.create(chatObj);
